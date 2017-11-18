@@ -1,0 +1,32 @@
+{
+	"manifest_version": 2,
+	"name": "Download Shelf",
+	"version": "1.0",
+	"author": "Axel Forsman",
+	"description": "Pimps your downloads.",
+
+	"icons": {
+		"48": "icon.png"
+	},
+
+	"permissions": [
+		"downloads",
+		"downloads.open",
+		"tabs",
+		"history"
+	],
+
+	"background": {
+		"scripts": ["shared.js", "background.js"]
+	},
+
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"match_about_blank": true,
+			"run_at": "document_start",
+			"css": ["style.css"],
+			"js": ["shared.js", "bar.js"]
+		}
+	]
+}
