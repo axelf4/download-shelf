@@ -1,8 +1,5 @@
 "use strict";
 
-// TODO replace default shelf, needs "downloads.shelf" permission
-// browser.downloads.setShelfEnabled(false);
-
 // TODO add button to clear all downloads
 
 /** Default error handler. */
@@ -15,7 +12,6 @@ const getDownloadItemFromId = function(id) {
 	return browser.downloads.search({id}).then(downloads => downloads[0], onError);
 };
 
-// TODO handle multiple windows
 const getActiveTab = function() {
 	return browser.tabs.query({active: true}).then(tabs => tabs[0], onError);
 }
@@ -34,7 +30,7 @@ var activeId = null;
  *
  * @param message The message to post.
  */
-const postToCSs = function(message) {
+const postToContentScripts = function(message) {
 	for (var [windowId, port] of ports) try {
 		port.postMessage(message);
 	} catch (e) {
@@ -55,9 +51,9 @@ const fetchDownloadIcon = function(downloadId) {
 		iconByDownloadId[downloadId] = iconUrl;
 
 		// Update the content page
-		postToCSs({
+		postToContentScripts({
 			type: MessageType.changeDownload,
-			delta: flatDownloadDeltaFromIconUrl(downloadId, iconUrl)
+			delta: { id: downloadId, iconUrl }
 		});
 
 		return iconUrl;
@@ -68,12 +64,15 @@ const checkProgress = function() {
 	browser.downloads.search({
 		state: browser.downloads.State.IN_PROGRESS
 	}).then(downloads => {
-		for (let download of downloads)
+		for (const download of downloads)
 			// Firefox doesn't call onChanged for totalBytes: do it here
-			postToCSs({
+			postToContentScripts({
 				type: MessageType.changeDownload,
-				delta: flatDownloadDeltaFromBytesReceived(download.id,
-					download.bytesReceived, download.totalBytes)
+				delta: {
+					id: download.id,
+					bytesReceived: download.bytesReceived,
+					totalBytes: download.totalBytes
+				}
 			});
 
 		// If there are downloads in progress: continue checking
@@ -84,7 +83,7 @@ const checkProgress = function() {
 const removeDownload = function(downloadId) {
 	active.delete(downloadId);
 	// browser.downloads.erase({ id: downloadId });
-	postToCSs({
+	postToContentScripts({
 		type: MessageType.wipeoutDownload,
 		downloadId
 	});
@@ -98,7 +97,7 @@ browser.downloads.onCreated.addListener(item => {
 	fetchDownloadIcon(item.id);
 
 	// Notify the client
-	postToCSs({
+	postToContentScripts({
 		type: MessageType.addNewDownload,
 		download: item
 	});
@@ -118,7 +117,7 @@ browser.downloads.onChanged.addListener(delta => {
 	checkProgress(); // Download might have started again
 
 	// Send changes to content script
-	postToCSs({
+	postToContentScripts({
 		type: MessageType.changeDownload,
 		delta: flattenDownloadDelta(delta)
 	});

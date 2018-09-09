@@ -76,11 +76,3 @@ const flattenDownloadDelta = function(downloadDelta) {
 
 	return result;
 };
-
-const flatDownloadDeltaFromBytesReceived = function(id, bytesReceived, totalBytes) {
-	return { id, bytesReceived, totalBytes };
-};
-
-const flatDownloadDeltaFromIconUrl = function(id, iconUrl) {
-	return { id, iconUrl };
-};
