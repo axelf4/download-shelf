@@ -12,7 +12,7 @@ const bar = document.createElement("div");
 document.addEventListener("DOMContentLoaded", event => {
 	document.body.appendChild(bar);
 });
-const shadow = bar.attachShadow({mode: "open"});
+const shadow = bar.attachShadow({mode: "closed"});
 const style = document.createElement("style");
 style.textContent = `
 :host {
@@ -20,16 +20,21 @@ style.textContent = `
 	contain: style;
 	position: fixed;
 	display: flex;
-	background: linear-gradient(-10deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
+	background: linear-gradient(-10deg, #EE775240, #E73C7E40, #23A6D540, #23D5AB40);
 	left: 0px;
 	bottom: 0px;
 	align-items: stretch;
 	width: 100%;
 	z-index: 2000000000; /* One higher than YouTube's sidebar. */
+	pointer-events: none;
 	margin: 0;
 	border: 0;
 	box-shadow: 0px -2px 7px 0px #3A3A3A;
 	font: normal normal 16px/1.4 Helvetica,Roboto,"Segoe UI",Calibri,sans-serif;
+}
+
+:host > * {
+	pointer-events: auto;
 }
 
 #item-container {
@@ -80,6 +85,7 @@ bar-item.shrinkOut {
 bar-item > img {
 	width: 16px;
 	height: 16px;
+	margin-right: 0.2em;
 }
 
 bar-item > span {
