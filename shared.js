@@ -46,6 +46,8 @@ const MessageType = Object.freeze({
 	removeDownload: 11,
 	/** Open the default downloads folder. */
 	showAllDownloads: 7,
+	/** User wishes to remove all downloads. */
+	clearDownloads: 13,
 });
 
 /**

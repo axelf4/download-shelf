@@ -3,7 +3,7 @@
 // TODO add button to clear all downloads
 
 /** Default error handler. */
-function onError(error) { console.error(`error: ${error}`); }
+function onError(error) { console.error(`Error: ${error}`); }
 
 /**
  * Returns a promise.
@@ -25,6 +25,7 @@ const ports = new Map();
 const iconByDownloadId = {};
 /** FIXME A filthy hack to share the download id with open-page. */
 var activeId = null;
+var pendingRemovals = [];
 
 /**
  * Posts the specified message to all connected content scripts.
@@ -137,6 +138,8 @@ async function sendInitialDownloads(port) {
 		type: MessageType.activeDownloads,
 		downloads
 	});
+
+	pendingRemovals.splice(0).forEach(removeDownload);
 }
 
 async function openOpenPage(downloadId) {
@@ -167,7 +170,6 @@ const setupPort = function(port) {
 
 		switch (m.type) {
 			case MessageType.openDownload:
-				// removeDownload(m.downloadId);
 				openOpenPage(m.downloadId);
 				break;
 			case MessageType.showDownload:
@@ -185,6 +187,9 @@ const setupPort = function(port) {
 				break;
 			case MessageType.removeDownload:
 				removeDownload(m.downloadId);
+				break;
+			case MessageType.clearDownloads:
+				active.forEach(removeDownload);
 				break;
 			case MessageType.showAllDownloads:
 				browser.downloads.showDefaultFolder();
