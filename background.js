@@ -13,7 +13,8 @@ const getDownloadItemFromId = function(id) {
 };
 
 const getActiveTab = function() {
-	return browser.tabs.query({active: true}).then(tabs => tabs[0], onError);
+	return browser.tabs.query({currentWindow: true, active: true})
+		.then(tabs => tabs[0], onError);
 }
 
 // Set of IDs of active downloads
@@ -140,7 +141,6 @@ async function sendInitialDownloads(port) {
 
 async function openOpenPage(downloadId) {
 	activeId = downloadId;
-	// TODO handle multiple windows
 	let tab = await getActiveTab();
 	const url = "/open-page.html";
 	browser.tabs.create({
