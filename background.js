@@ -1,7 +1,5 @@
 "use strict";
 
-// TODO add button to clear all downloads
-
 /** Default error handler. */
 function onError(error) { console.error(`Error: ${error}`); }
 

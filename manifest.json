@@ -27,5 +27,7 @@
 			"run_at": "document_start",
 			"js": ["shared.js", "content.js"]
 		}
-	]
+	],
+
+	"web_accessible_resources": ["images/*"]
 }

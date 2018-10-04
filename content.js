@@ -43,6 +43,22 @@ style.textContent = `
 	flex-flow: row wrap;
 }
 
+#clear-button {
+	background: url(${browser.runtime.getURL("images/clear.svg")}) center/contain no-repeat;
+	border: none;
+	cursor: pointer;
+	width: 24px;
+	margin-left: auto;
+}
+
+#clear-button:hover {
+	filter: brightness(150%);
+}
+
+#clear-button:hover:active {
+	filter: brightness(75%);
+}
+
 bar-item {
 	display: flex;
 	align-items: center;
@@ -92,13 +108,21 @@ bar-item > span {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	margin: 0 !important;
+	margin: 0;
 }
 `;
 shadow.appendChild(style);
 const itemContainer = document.createElement("span");
 itemContainer.id = "item-container";
 shadow.appendChild(itemContainer);
+
+const clearButton = document.createElement("button");
+clearButton.id = "clear-button";
+clearButton.title = "Clear downloads";
+clearButton.addEventListener("click", () => {
+	port.postMessage({ type: MessageType.clearDownloads });
+});
+shadow.appendChild(clearButton);
 
 customElements.define("bar-item", class extends HTMLElement {
 	constructor() {
