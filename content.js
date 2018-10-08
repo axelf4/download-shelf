@@ -289,7 +289,7 @@ const setupPortListeners = function(port) {
 			case MessageType.changeDownload:
 				updateItem(getBarItemByDownloadId(m.delta.id), m.delta);
 				break;
-			case MessageType.wipeoutDownload:
+			case MessageType.animateRemoval:
 				removeBarItem(getBarItemByDownloadId(m.downloadId));
 				break;
 		}

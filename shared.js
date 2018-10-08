@@ -1,5 +1,5 @@
 const MessageType = Object.freeze({
-	/** Messages sent from the background script to the content script. */
+	/* Messages sent from the background script to the content script. */
 
 	/**
 	 * Initial dump of active downloads.
@@ -24,10 +24,11 @@ const MessageType = Object.freeze({
 	 *
 	 * downloadId: integer the id of the download
 	 */
-	wipeoutDownload: 12,
+	animateRemoval: 12,
 
-	/** Messages sent from the content script to the background script. */
+	/* Messages sent from the content script to the background script. */
 
+	/** User wishes to open download with specified ID. */
 	openDownload: 1,
 	/**
 	 * Opens the containing folder of the download.
@@ -48,6 +49,8 @@ const MessageType = Object.freeze({
 	showAllDownloads: 7,
 	/** User wishes to remove all downloads. */
 	clearDownloads: 13,
+	/** Request from open page to get associated download ID. */
+	getDownloadIdToOpen: 6,
 });
 
 /**
@@ -59,22 +62,18 @@ const getFileNameFromPath = function(path) {
 	return path.split("\\").pop().split("/").pop();
 };
 
+/**
+ * Maps all deltas in a download delta to their current value.
+ * @param downloadDelta The download delta.
+ * @return The new object.
+ */
 const flattenDownloadDelta = function(downloadDelta) {
 	const result = { id: downloadDelta.id };
 
-	if (downloadDelta.url) result.url = downloadDelta.url.current;
-	if (downloadDelta.filename) result.filename = downloadDelta.filename.current;
-	if (downloadDelta.danger) result.danger = downloadDelta.danger.current;
-	if (downloadDelta.mime) result.mime = downloadDelta.mime.current;
-	if (downloadDelta.startTime) result.startTime = downloadDelta.startTime.current;
-	if (downloadDelta.endTime) result.endTime = downloadDelta.endTime.current;
-	if (downloadDelta.state) result.state = downloadDelta.state.current;
-	if (downloadDelta.canResume) result.canResume = downloadDelta.canResume.current;
-	if (downloadDelta.paused) result.paused = downloadDelta.paused.current;
-	if (downloadDelta.error) result.error = downloadDelta.error.current;
-	if (downloadDelta.totalBytes) result.totalBytes = downloadDelta.totalBytes.current;
-	if (downloadDelta.fileSize) result.fileSize = downloadDelta.fileSize.current;
-	if (downloadDelta.exists) result.exists = downloadDelta.exists.current;
+	for (const [key, delta] of Object.entries(downloadDelta)) {
+		if (key === "id") continue;
+		result[key] = delta.current;
+	}
 
 	return result;
 };
