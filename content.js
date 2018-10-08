@@ -130,7 +130,7 @@ customElements.define("bar-item", class extends HTMLElement {
 		this._iconUrl = this._name = "";
 		this.addEventListener("click", event => {
 			port.postMessage({
-				type: MessageType.openDownload,
+				type: MessageType.clickDownload,
 				downloadId: +this.getAttribute("data-id")
 			});
 		});

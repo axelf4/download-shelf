@@ -13,16 +13,35 @@ const getDownloadItemFromId = id => browser.downloads.search({id})
 const getActiveTab = () => browser.tabs.query({currentWindow: true, active: true})
 	.then(tabs => tabs[0], onError);
 
+const defaultOptions = Object.freeze({
+	removeOnOpen: true,
+	removeOnShow: false,
+	defaultAction: "open",
+});
+
 /** Set of IDs of active downloads. */
 const active = new Set();
 /** Map of ports by windowId. */
 const ports = new Map();
 /** Map of icon URLs by download IDs. */
 const iconByDownloadId = {};
+/** The current options in use. */
+const options = {};
 /** Queue of download IDs that have yet to be assigned to open page scripts. */
 const openingQueue = [];
 /** Downloads removed when animation can play. Populated by open pages. */
 var pendingRemovals = [];
+
+// Lookup options from storage
+browser.storage.sync.get(defaultOptions)
+	.then(Object.assign.bind(null, options), onError);
+
+// Detect when options change
+browser.storage.onChanged.addListener(changes => {
+	for (const [key, change] of Object.entries(changes)) {
+		options[key] = change.newValue;
+	}
+});
 
 /**
  * Posts the specified message to all connected content scripts.
@@ -123,7 +142,8 @@ async function sendInitialDownloads(port) {
 	downloads.forEach(d => d.iconUrl = iconByDownloadId[d.id]);
 	port.postMessage({type: MessageType.activeDownloads, downloads});
 
-	pendingRemovals.splice(0).forEach(removeDownload);
+	const openedDownloads = pendingRemovals.splice(0);
+	if (options.removeOnOpen) openedDownloads.forEach(removeDownload);
 }
 
 async function openOpenPage(downloadId) {
@@ -159,6 +179,11 @@ const setupPort = function(port) {
 			return;
 		}
 
+		if (m.type === MessageType.clickDownload)
+			m.type = options.defaultAction === "open" ? MessageType.openDownload
+				: options.defaultAction === "show" ? MessageType.showDownload
+				: null;
+
 		switch (m.type) {
 			case MessageType.openDownload:
 				openOpenPage(m.downloadId);
@@ -166,6 +191,7 @@ const setupPort = function(port) {
 			case MessageType.showDownload:
 				// Open the file manager
 				browser.downloads.show(m.downloadId).catch(onError);
+				if (options.removeOnShow) removeDownload(m.downloadId);
 				break;
 			case MessageType.pauseDownload:
 				browser.downloads.pause(m.downloadId).catch(onError);
@@ -229,5 +255,13 @@ browser.runtime.onConnect.addListener(async port => {
 		setupPort(port);
 	} else {
 		port.disconnect();
+	}
+});
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	switch (request.type) {
+		case MessageType.getOptions:
+			sendResponse(options);
+			break;
 	}
 });

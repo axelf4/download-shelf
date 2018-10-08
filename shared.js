@@ -39,6 +39,8 @@ const MessageType = Object.freeze({
 	pauseDownload: 3,
 	resumeDownload: 4,
 	cancelDownload: 5,
+	/** User clicked a download bar item. */
+	clickDownload: 8,
 	/**
 	 * Hides the download from the bar.
 	 *
@@ -51,6 +53,8 @@ const MessageType = Object.freeze({
 	clearDownloads: 13,
 	/** Request from open page to get associated download ID. */
 	getDownloadIdToOpen: 6,
+	/** Request the current options from the background script. */
+	getOptions: 14,
 });
 
 /**

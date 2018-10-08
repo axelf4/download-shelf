@@ -13,7 +13,8 @@
 		"downloads",
 		"downloads.open",
 		"tabs",
-		"history"
+		"history",
+		"storage"
 	],
 
 	"background": {
@@ -28,6 +29,17 @@
 			"js": ["shared.js", "content.js"]
 		}
 	],
+
+	"options_ui": {
+		"page": "options.html",
+		"browser_style": true
+	},
+
+	"applications": {
+		"gecko": {
+			"id": "{a18943fe-b50c-4191-8104-552f1d9fe1d2}"
+		}
+	},
 
 	"web_accessible_resources": ["images/*"]
 }
