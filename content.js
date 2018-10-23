@@ -250,6 +250,7 @@ itemContainer.addEventListener("contextmenu", event => {
 });
 
 const updateItem = function(barItem, properties) {
+	if (!barItem) return;
 	for (const [property, value] of Object.entries(properties)) {
 		switch (property) {
 			case "url":
