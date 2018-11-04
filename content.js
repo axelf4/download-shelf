@@ -8,6 +8,14 @@ const removeAllChildren = (f => node => f.call(node))(
 	}
 );
 
+/** Tag function that sanitizes and encodes HTML. */
+const sanitize = (function() {
+	const div = document.createElement("div");
+	return (strings, ...values) => strings.map((s, i) =>
+		values[i] ? (div.textContent = values[i], s + div.innerHTML) : s
+	).join("");
+})();
+
 const bar = document.createElement("div");
 document.addEventListener("DOMContentLoaded", event => {
 	document.body.appendChild(bar);
@@ -155,7 +163,7 @@ customElements.define("bar-item", class extends HTMLElement {
 				break;
 		}
 
-		this.innerHTML = `<img src="${this._iconUrl}"><span>${this._name}</span>`;
+		this.innerHTML = sanitize`<img src="${this._iconUrl}"><span>${this._name}</span>`;
 		this.style.backgroundPosition = `-${this._percentage}% 0`;
 	}
 });
