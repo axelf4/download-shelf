@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Download Shelf",
-	"version": "1.0",
+	"version": "2.0",
 	"author": "Axel Forsman",
 	"description": "Pimps your downloads.",
 
@@ -37,7 +37,8 @@
 
 	"applications": {
 		"gecko": {
-			"id": "{a18943fe-b50c-4191-8104-552f1d9fe1d2}"
+			"id": "{a18943fe-b50c-4191-8104-552f1d9fe1d2}",
+			"strict_min_version": "63.0"
 		}
 	},
 
